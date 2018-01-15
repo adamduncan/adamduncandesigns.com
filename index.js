@@ -1,95 +1,26 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(typeof self !== 'undefined' ? self : this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+const collectionData = require('./pinstagram/collectionFetched.json');
 
-const testVar = 'Hello';
-const collectionData = __webpack_require__(1);
+const truncate = function (str, length = 140) {
+  return str.substring(0, length).replace(/\n/g, ' ').replace(' •', ' ');
+};
 
 const renderItem = function (item) {
   const itemShortcode = item.url.split('https://www.instagram.com/p/')[1].slice(0, -1);
+  const imageRatioStyle = (item.thumbnail_height && item.thumbnail_width)
+    ? `padding-top: ${ item.thumbnail_height / item.thumbnail_width * 100 }%`
+    : 'padding-top: 100%';
+  // data-shortcode="${ itemShortcode }"
+  // alt="${ truncate(item.title) }"
   return `
-    <div class="grid__col" data-shortcode="${ itemShortcode }">
+    <div class="grid__col">
       <div class="card">
-        <a class="card__image-link" href="${ item.url }" target="_blank" rel="noopener noreferrer">
-          <img src="${ item.thumbnail_url }" alt="${ item.title }" />
-        </a>
+        <div class="media-wrap" style="${ imageRatioStyle }">
+          <a class="card__image-link" href="${ item.url }" target="_blank" rel="noopener noreferrer">
+            <img data-src="${ item.thumbnail_url }" alt="Post by ${ item.author_name }" />
+          </a>
+        </div>
         <p class="card__attr"><a class="card__link" href="${ item.author_url }" target="_blank" rel="noopener noreferrer">
-          &mdash; ${ item.author_name }
+          — ${ item.author_name }
           </a></p>
       </div>
     </div>
@@ -155,9 +86,26 @@ module.exports = function render(locals) {
           padding: 12vw 6vw;
         }
 
+        .media-wrap {
+          position: relative;
+        }
         img {
           height: auto;
+          transition: opacity 300ms ease-out;
           width: 100%;
+          will-change: opacity;
+        }
+        img[data-src] {
+          opacity: 0;
+        }
+        img.show {
+          opacity: 1;
+        }
+        .error {
+          background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201000%201000%22%3E%3Cpath%20fill%3D%22%23CCC%22%20d%3D%22M63.02%2063.02L10%20116.23l191.79%20191.79L393.77%20500%20201.79%20691.98%2010%20883.77l53.02%2053.21L116.23%20990l191.79-191.79L500%20606.23l191.98%20191.98L883.77%20990l53.21-53.02L990%20883.77%20798.21%20691.98%20606.23%20500l191.98-191.98L990%20116.23l-53.02-53.21L883.77%2010%20691.98%20201.79%20500%20393.77%20308.02%20201.79%20116.23%2010%2063.02%2063.02z%22/%3E%3C/svg%3E');
+          background-repeat: no-repeat;
+          background-size: 22px 22px;
+          background-position: center;
         }
 
         h1, h2, h3, p, ul, li {
@@ -186,14 +134,27 @@ module.exports = function render(locals) {
         }
 
         a {
+          text-decoration: none;
+          transition: border 200ms ease-out, color 200ms ease-out;
+        }
+        a:not[class] {
           border-bottom: 1px solid #fb576b;
           color: #fb576b;
-          text-decoration: none;
-          transition: color 200ms ease-out;
         }
-        a:hover,
-        a:focus {
+        a:not[class]:hover,
+        a:not[class]:focus {
           color: #fff;
+        }
+        .link--breadcrumb {
+          border-bottom: 1px solid transparent;
+          color: currentColor;
+          font-weight: 300;
+          opacity: 0.4;
+          text-decoration: none;
+        }
+        .link--breadcrumb[href]:hover,
+        .link--breadcrumb[href]:focus {
+          border-bottom-color: currentColor;
         }
 
         @media (min-width: 47.5em) {
@@ -221,18 +182,24 @@ module.exports = function render(locals) {
         .card__image-link {
           border-bottom: 0;
           display: block;
-          padding-bottom: 0.375rem;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.05);
         }
         .card__attr {
           font-size: 0.75rem;
+          margin-top: 0.75rem;
         }
         .card__link {
-          border-bottom-color: transparent;
-          color: #aaa;
+          border-bottom: 1px solid transparent;
+          color: #888;
         }
         .card__link:hover,
         .card__link:focus {
-          border-bottom-color: #aaa;
+          border-bottom-color: #888;
           color: #212637;
         }
 
@@ -242,6 +209,9 @@ module.exports = function render(locals) {
 
         .pad-top {
           padding-top: 2em;
+        }
+        .pad-bottom {
+          padding-bottom: 2em;
         }
 
         .visually-hidden {
@@ -265,9 +235,9 @@ module.exports = function render(locals) {
       <h1>Pinstagram</h1>
       <p class="t-large">Visual inspiration collected from Instagram</p>
 
-      <p class="pad-top">Hello, brief project description</p>
+      <p class="pad-top"><a href="/" class="link--breadcrumb"><span aria-label="Back to">&larr;</span> Adam Duncan</a></p>
 
-      <div class="grid pad-top">
+      <div class="grid pad-top pad-bottom">
       ${ 
         collectionData.items.map(function (item) {
           return renderItem(item)
@@ -275,6 +245,53 @@ module.exports = function render(locals) {
       }
       </div>
 
+      <p class="pad-top" style="font-size: 0.75rem">All rights reserved by each respective creator.<br />
+      Built to showcase some amazing work, because Instagram Collections aren't Pinterest, yet.
+      <a href="https://github.com/adamduncan/adamduncandesigns.com" style="border-bottom: 1px solid currentColor; color: currentColor;">Code</a></p>
+
+      <script>
+      var images = document.querySelectorAll('[data-src]');
+      var config = {
+        rootMargin: '100px 0px',
+        threshold: 0.01
+      };
+
+      function imageNotFound(event) {
+        event.currentTarget.parentNode.classList.add('error');
+        event.currentTarget.removeEventListener('error', imageNotFound);
+      }
+
+      function showImage(event) {
+        event.currentTarget.classList.add('show');
+        event.currentTarget.removeEventListener('load', showImage);
+      }
+
+      function loadImage(imageEl) {
+        imageEl.setAttribute('src', imageEl.getAttribute('data-src'));
+        imageEl.addEventListener('load', showImage);
+        imageEl.addEventListener('error', imageNotFound);
+      }
+
+      if (!('IntersectionObserver' in window)) {
+        [].slice.call(images).forEach(function(image) {
+          loadImage(image);
+        });
+      } else {
+        var observer = new IntersectionObserver(onIntersection, config);
+        images.forEach(function(image) {
+          observer.observe(image);
+        });
+
+        function onIntersection(entries) {
+          entries.forEach(function(entry) {
+            if (entry.intersectionRatio > 0) {
+              observer.unobserve(entry.target);
+              loadImage(entry.target);
+            }
+          });
+        }
+      }
+      </script>
       <script type="text/javascript">
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-2589170-5']);
@@ -289,13 +306,3 @@ module.exports = function render(locals) {
   </html>
   `;
 };
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = {"items":[{"url":"https://www.instagram.com/p/Bd7pqo5n5XK/","version":"1.0","title":"New on CP: Find Issue 002 of ‘SPIN/Adentures in typography’ within our ‘Magazine’ section at Counter-Print.co.uk #counterprintbooks #spinadventures #magazine","author_name":"counterprintbooks","author_url":"https://www.instagram.com/counterprintbooks","author_id":224282811,"media_id":"1692129335049164234_224282811","provider_name":"Instagram","provider_url":"https://www.instagram.com","type":"rich","width":658,"height":null,"html":"<blockquote class=\"instagram-media\" data-instgrm-captioned data-instgrm-permalink=\"https://www.instagram.com/p/Bd7pqo5n5XK/\" data-instgrm-version=\"8\" style=\" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);\"><div style=\"padding:8px;\"> <div style=\" background:#F8F8F8; line-height:0; margin-top:40px; padding:50% 0; text-align:center; width:100%;\"> <div style=\" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;\"></div></div> <p style=\" margin:8px 0 0 0; padding:0 4px;\"> <a href=\"https://www.instagram.com/p/Bd7pqo5n5XK/\" style=\" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;\" target=\"_blank\">New on CP: Find Issue 002 of ‘SPIN/Adentures in typography’ within our ‘Magazine’ section at Counter-Print.co.uk #counterprintbooks #spinadventures #magazine</a></p> <p style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;\">A post shared by <a href=\"https://www.instagram.com/counterprintbooks/\" style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;\" target=\"_blank\"> Counter-Print</a> (@counterprintbooks) on <time style=\" font-family:Arial,sans-serif; font-size:14px; line-height:17px;\" datetime=\"2018-01-14T13:45:57+00:00\">Jan 14, 2018 at 5:45am PST</time></p></div></blockquote>","thumbnail_url":"https://instagram.flhr4-2.fna.fbcdn.net/vp/8b5530379f07f1be0281e232e1fe7d27/5ADCAC95/t51.2885-15/s612x612/e35/26157776_160499974575892_7014619460606623744_n.jpg","thumbnail_width":612,"thumbnail_height":612},{"url":"https://www.instagram.com/p/Bds48Lxjtjb/","version":"1.0","title":"Reaally short on time today, so here is a quick repost of one of my favourites of 2017 (didn‘t quite make it into the top 9 though). Would love to hear your thoughts!😄 #typographicposter #typographic #typeposter #typeinspire #posterlabs #posteraday #typelover #printisntdead #condensedtype #helvetica #goodtype","author_name":"stefanhuerlemann","author_url":"https://www.instagram.com/stefanhuerlemann","author_id":22281493,"media_id":"1687974386772924635_22281493","provider_name":"Instagram","provider_url":"https://www.instagram.com","type":"rich","width":658,"height":null,"html":"<blockquote class=\"instagram-media\" data-instgrm-captioned data-instgrm-permalink=\"https://www.instagram.com/p/Bds48Lxjtjb/\" data-instgrm-version=\"8\" style=\" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);\"><div style=\"padding:8px;\"> <div style=\" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;\"> <div style=\" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;\"></div></div> <p style=\" margin:8px 0 0 0; padding:0 4px;\"> <a href=\"https://www.instagram.com/p/Bds48Lxjtjb/\" style=\" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;\" target=\"_blank\">Reaally short on time today, so here is a quick repost of one of my favourites of 2017 (didn‘t quite make it into the top 9 though). Would love to hear your thoughts!😄 #typographicposter #typographic #typeposter #typeinspire #posterlabs #posteraday #typelover #printisntdead #condensedtype #helvetica #goodtype</a></p> <p style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;\">A post shared by <a href=\"https://www.instagram.com/stefanhuerlemann/\" style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;\" target=\"_blank\"> Stefan Hürlemann Designer</a> (@stefanhuerlemann) on <time style=\" font-family:Arial,sans-serif; font-size:14px; line-height:17px;\" datetime=\"2018-01-08T20:10:49+00:00\">Jan 8, 2018 at 12:10pm PST</time></p></div></blockquote>","thumbnail_url":"https://instagram.flhr4-2.fna.fbcdn.net/vp/e5dea08acb87338464fc578120e3375e/5AE6DDEA/t51.2885-15/s640x640/sh0.08/e35/26067668_259504454584168_7807979145144565760_n.jpg","thumbnail_width":640,"thumbnail_height":640},{"url":"https://www.instagram.com/p/Bdzgp6Ah9aY/","version":"1.0","title":"one of the examples that are generated from the basic glyph concept shown in the last post. \n#bauhaus #bauhausarchiv #saschalobe #L2M3","author_name":"sascha_lobe","author_url":"https://www.instagram.com/sascha_lobe","author_id":229971550,"media_id":"1689837902466897560_229971550","provider_name":"Instagram","provider_url":"https://www.instagram.com","type":"rich","width":658,"height":null,"html":"<blockquote class=\"instagram-media\" data-instgrm-captioned data-instgrm-permalink=\"https://www.instagram.com/p/Bdzgp6Ah9aY/\" data-instgrm-version=\"8\" style=\" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);\"><div style=\"padding:8px;\"> <div style=\" background:#F8F8F8; line-height:0; margin-top:40px; padding:62.4537037037037% 0; text-align:center; width:100%;\"> <div style=\" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;\"></div></div> <p style=\" margin:8px 0 0 0; padding:0 4px;\"> <a href=\"https://www.instagram.com/p/Bdzgp6Ah9aY/\" style=\" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;\" target=\"_blank\">one of the examples that are generated from the basic glyph concept shown in the last post.  #bauhaus #bauhausarchiv #saschalobe #L2M3</a></p> <p style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;\">A post shared by <a href=\"https://www.instagram.com/sascha_lobe/\" style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;\" target=\"_blank\"> Sascha Lobe</a> (@sascha_lobe) on <time style=\" font-family:Arial,sans-serif; font-size:14px; line-height:17px;\" datetime=\"2018-01-11T09:53:17+00:00\">Jan 11, 2018 at 1:53am PST</time></p></div></blockquote>","thumbnail_url":"https://instagram.flhr4-2.fna.fbcdn.net/vp/733e9b7a3d2c9de0191cea1d5d5083e7/5AE3D81C/t51.2885-15/sh0.08/e35/p640x640/26151827_207604203131538_3292001679725035520_n.jpg","thumbnail_width":640,"thumbnail_height":799},{"url":"https://www.instagram.com/p/Bduu-Nbn2Y7/","version":"1.0","title":"New year, new identity. \nFor those of you following us on instagram @design_process this will come as no surprise 😉 As we kick-off 2018 we’re rolling out our new look, feel and positioning. Here’s our holding page and showreel - website coming soon 💥 — Sennep.com","author_name":"sennepldn","author_url":"https://www.instagram.com/sennepldn","author_id":1699466089,"media_id":"1688493495479658043_1699466089","provider_name":"Instagram","provider_url":"https://www.instagram.com","type":"rich","width":658,"height":null,"html":"<blockquote class=\"instagram-media\" data-instgrm-captioned data-instgrm-permalink=\"https://www.instagram.com/p/Bduu-Nbn2Y7/\" data-instgrm-version=\"8\" style=\" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);\"><div style=\"padding:8px;\"> <div style=\" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;\"> <div style=\" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;\"></div></div> <p style=\" margin:8px 0 0 0; padding:0 4px;\"> <a href=\"https://www.instagram.com/p/Bduu-Nbn2Y7/\" style=\" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;\" target=\"_blank\">New year, new identity.  For those of you following us on instagram @design_process this will come as no surprise 😉 As we kick-off 2018 we’re rolling out our new look, feel and positioning. Here’s our holding page and showreel - website coming soon 💥 — Sennep.com</a></p> <p style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;\">A post shared by <a href=\"https://www.instagram.com/sennepldn/\" style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;\" target=\"_blank\"> Sennep</a> (@sennepldn) on <time style=\" font-family:Arial,sans-serif; font-size:14px; line-height:17px;\" datetime=\"2018-01-09T13:22:20+00:00\">Jan 9, 2018 at 5:22am PST</time></p></div></blockquote>","thumbnail_url":"https://instagram.flhr4-2.fna.fbcdn.net/vp/b34d06fa4a2c9c88ebc258739c03c8b2/5A5E5BCE/t51.2885-15/s640x640/e15/26152953_1918451065112311_7813652921496633344_n.jpg","thumbnail_width":640,"thumbnail_height":640},{"url":"https://www.instagram.com/p/BdxKeGch4U8/","version":"1.0","title":"De La Montagne Hotel by @simonlangloisssssss\n—\nSee more on the-brandidentity.com\n—\n#logo #branding #brandidentity #logotype #graphicdesign #design #contemporary #typography #studio","author_name":"thebrandidentity","author_url":"https://www.instagram.com/thebrandidentity","author_id":1956899935,"media_id":"1689177384211154236_1956899935","provider_name":"Instagram","provider_url":"https://www.instagram.com","type":"rich","width":658,"height":null,"html":"<blockquote class=\"instagram-media\" data-instgrm-captioned data-instgrm-permalink=\"https://www.instagram.com/p/BdxKeGch4U8/\" data-instgrm-version=\"8\" style=\" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);\"><div style=\"padding:8px;\"> <div style=\" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;\"> <div style=\" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;\"></div></div> <p style=\" margin:8px 0 0 0; padding:0 4px;\"> <a href=\"https://www.instagram.com/p/BdxKeGch4U8/\" style=\" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;\" target=\"_blank\">De La Montagne Hotel by @simonlangloisssssss — See more on the-brandidentity.com — #logo #branding #brandidentity #logotype #graphicdesign #design #contemporary #typography #studio</a></p> <p style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;\">A post shared by <a href=\"https://www.instagram.com/thebrandidentity/\" style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;\" target=\"_blank\"> The Brand Identity</a> (@thebrandidentity) on <time style=\" font-family:Arial,sans-serif; font-size:14px; line-height:17px;\" datetime=\"2018-01-10T12:00:57+00:00\">Jan 10, 2018 at 4:00am PST</time></p></div></blockquote>","thumbnail_url":"https://instagram.flhr4-2.fna.fbcdn.net/vp/1c4cf99d240367d3786abc225cd5f393/5AFF448A/t51.2885-15/s640x640/sh0.08/e35/26262013_916181305207397_3852985710650851328_n.jpg","thumbnail_width":640,"thumbnail_height":640},{"url":"https://www.instagram.com/p/BdudVj6lRWW/","version":"1.0","title":"Feeling anxious 😟 today I’m trying to combine hand embroidery and painting on some new canvas. I’m not sure 🤔 #acrylic #pencil #handembroidery #rawcanvas #artwork #kunst #art #minimalart #contemporaryart #abstractart #mypaaske","author_name":"paaskemy","author_url":"https://www.instagram.com/paaskemy","author_id":1301403183,"media_id":"1688415935332160918_1301403183","provider_name":"Instagram","provider_url":"https://www.instagram.com","type":"rich","width":658,"height":null,"html":"<blockquote class=\"instagram-media\" data-instgrm-captioned data-instgrm-permalink=\"https://www.instagram.com/p/BdudVj6lRWW/\" data-instgrm-version=\"8\" style=\" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);\"><div style=\"padding:8px;\"> <div style=\" background:#F8F8F8; line-height:0; margin-top:40px; padding:62.5% 0; text-align:center; width:100%;\"> <div style=\" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;\"></div></div> <p style=\" margin:8px 0 0 0; padding:0 4px;\"> <a href=\"https://www.instagram.com/p/BdudVj6lRWW/\" style=\" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;\" target=\"_blank\">Feeling anxious 😟 today I’m trying to combine hand embroidery and painting on some new canvas. I’m not sure 🤔 #acrylic #pencil #handembroidery #rawcanvas #artwork #kunst #art #minimalart #contemporaryart #abstractart #mypaaske</a></p> <p style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;\">A post shared by <a href=\"https://www.instagram.com/paaskemy/\" style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;\" target=\"_blank\"> Anne Mette My Paaske</a> (@paaskemy) on <time style=\" font-family:Arial,sans-serif; font-size:14px; line-height:17px;\" datetime=\"2018-01-09T10:48:05+00:00\">Jan 9, 2018 at 2:48am PST</time></p></div></blockquote>","thumbnail_url":"https://instagram.flhr4-2.fna.fbcdn.net/vp/2ae954591c68a101954067b170198b94/5AE1F5B4/t51.2885-15/sh0.08/e35/p640x640/26154045_155023661813402_2688578759119863808_n.jpg","thumbnail_width":640,"thumbnail_height":800},{"url":"https://www.instagram.com/p/BdvXVhpFfzW/","version":"1.0","title":"The Doorman/slash Hitman","author_name":"nicholasosmond","author_url":"https://www.instagram.com/nicholasosmond","author_id":1815911903,"media_id":"1688671019588779222_1815911903","provider_name":"Instagram","provider_url":"https://www.instagram.com","type":"rich","width":658,"height":null,"html":"<blockquote class=\"instagram-media\" data-instgrm-captioned data-instgrm-permalink=\"https://www.instagram.com/p/BdvXVhpFfzW/\" data-instgrm-version=\"8\" style=\" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);\"><div style=\"padding:8px;\"> <div style=\" background:#F8F8F8; line-height:0; margin-top:40px; padding:51.75925925925926% 0; text-align:center; width:100%;\"> <div style=\" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;\"></div></div> <p style=\" margin:8px 0 0 0; padding:0 4px;\"> <a href=\"https://www.instagram.com/p/BdvXVhpFfzW/\" style=\" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;\" target=\"_blank\">The Doorman/slash Hitman</a></p> <p style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;\">A post shared by <a href=\"https://www.instagram.com/nicholasosmond/\" style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;\" target=\"_blank\"> nick osmond</a> (@nicholasosmond) on <time style=\" font-family:Arial,sans-serif; font-size:14px; line-height:17px;\" datetime=\"2018-01-09T19:14:54+00:00\">Jan 9, 2018 at 11:14am PST</time></p></div></blockquote>","thumbnail_url":"https://instagram.flhr4-2.fna.fbcdn.net/vp/7ccd0d875084fcf6fb1e729f0292c1da/5AF174F0/t51.2885-15/sh0.08/e35/p640x640/26153257_167968213973832_1462996307764314112_n.jpg","thumbnail_width":640,"thumbnail_height":662},{"url":"https://www.instagram.com/p/BOhZowQBc3l/","version":"1.0","title":"Kimski by @therealfranklyn\n-\nSee more on the site\nwww.the-brandidentity.com\n-\n#logo #branding #brandidentity #logotype #graphicdesign #design #contemporary #typography #studio","author_name":"thebrandidentity","author_url":"https://www.instagram.com/thebrandidentity","author_id":1956899935,"media_id":"1414524509721316837_1956899935","provider_name":"Instagram","provider_url":"https://www.instagram.com","type":"rich","width":658,"height":null,"html":"<blockquote class=\"instagram-media\" data-instgrm-captioned data-instgrm-permalink=\"https://www.instagram.com/p/BOhZowQBc3l/\" data-instgrm-version=\"8\" style=\" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);\"><div style=\"padding:8px;\"> <div style=\" background:#F8F8F8; line-height:0; margin-top:40px; padding:50.0% 0; text-align:center; width:100%;\"> <div style=\" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;\"></div></div> <p style=\" margin:8px 0 0 0; padding:0 4px;\"> <a href=\"https://www.instagram.com/p/BOhZowQBc3l/\" style=\" color:#000; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none; word-wrap:break-word;\" target=\"_blank\">Kimski by @therealfranklyn - See more on the site www.the-brandidentity.com - #logo #branding #brandidentity #logotype #graphicdesign #design #contemporary #typography #studio</a></p> <p style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;\">A post shared by <a href=\"https://www.instagram.com/thebrandidentity/\" style=\" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px;\" target=\"_blank\"> The Brand Identity</a> (@thebrandidentity) on <time style=\" font-family:Arial,sans-serif; font-size:14px; line-height:17px;\" datetime=\"2016-12-27T13:14:43+00:00\">Dec 27, 2016 at 5:14am PST</time></p></div></blockquote>","thumbnail_url":"https://instagram.flhr4-2.fna.fbcdn.net/vp/b4a5b7320482f74a3b6ef788e42939c8/5AF3E1F9/t51.2885-15/s640x640/sh0.08/e35/14597362_391287517886125_8534948006904987648_n.jpg","thumbnail_width":640,"thumbnail_height":640}]}
-
-/***/ })
-/******/ ]);
-});
