@@ -1,0 +1,16 @@
+#<IfModule mod_rewrite.c>
+#RewriteEngine On
+#RewriteCond %{HTTPS} off
+#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+#</IfModule>
+
+# Redirect to www
+RewriteCond %{HTTP_HOST} ^[^.]+\.[^.]+$
+RewriteCond %{HTTPS}s ^on(s)|
+RewriteRule ^ http%1://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+#Gzip
+<IfModule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/html text/css text/javascript
+</IfModule>
+#End Gzip
