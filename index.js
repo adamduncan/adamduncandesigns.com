@@ -256,9 +256,15 @@ module.exports = function render(locals) {
         threshold: 0.01
       };
 
-      function imageNotFound(event) {
+      function noImageFound(event) {
         event.currentTarget.parentNode.classList.add('error');
-        event.currentTarget.removeEventListener('error', imageNotFound);
+        event.currentTarget.removeEventListener('error', noImageFound);
+      }
+
+      function mainImageNotFound(event) {
+        event.currentTarget.removeEventListener('error', mainImageNotFound);
+        // retry with fallback image
+        loadFallbackImage(event.currentTarget);
       }
 
       function showImage(event) {
@@ -269,12 +275,23 @@ module.exports = function render(locals) {
       function loadImage(imageEl) {
         imageEl.setAttribute('src', imageEl.getAttribute('data-src'));
         imageEl.addEventListener('load', showImage);
-        imageEl.addEventListener('error', imageNotFound);
+        imageEl.addEventListener('error', mainImageNotFound);
+      }
+
+      function loadFallbackImage(imageEl) {
+        // how sketchy's this?!
+        var imageUrl = imageEl.parentNode.getAttribute('href');
+        var fallbackImageId = imageUrl.slice(0, -1).split('/').pop()
+        var fallbackImageUrl = 'https://instagram.com/p/' + fallbackImageId + '/media/?size=m'
+        imageEl.setAttribute('src', fallbackImageUrl);
+        console.log('loading: ', fallbackImageUrl);
+        imageEl.addEventListener('load', showImage);
+        imageEl.addEventListener('error', noImageFound);
       }
 
       if (!('IntersectionObserver' in window)) {
         [].slice.call(images).forEach(function(image) {
-          loadImage(image);
+          loadImage(image, mainImageNotFound);
         });
       } else {
         var observer = new IntersectionObserver(onIntersection, config);
@@ -286,7 +303,7 @@ module.exports = function render(locals) {
           entries.forEach(function(entry) {
             if (entry.intersectionRatio > 0) {
               observer.unobserve(entry.target);
-              loadImage(entry.target);
+              loadImage(entry.target, mainImageNotFound);
             }
           });
         }
