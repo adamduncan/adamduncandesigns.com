@@ -284,7 +284,7 @@ module.exports = function render(locals) {
         var fallbackImageId = imageUrl.slice(0, -1).split('/').pop()
         var fallbackImageUrl = 'https://instagram.com/p/' + fallbackImageId + '/media/?size=m'
         imageEl.setAttribute('src', fallbackImageUrl);
-        console.log('loading: ', fallbackImageUrl);
+        // console.log('loading: ', fallbackImageUrl);
         imageEl.addEventListener('load', showImage);
         imageEl.addEventListener('error', noImageFound);
       }
