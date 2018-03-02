@@ -282,7 +282,7 @@ module.exports = function render(locals) {
         // how sketchy's this?!
         var imageUrl = imageEl.parentNode.getAttribute('href');
         var fallbackImageId = imageUrl.slice(0, -1).split('/').pop()
-        var fallbackImageUrl = 'https://instagram.com/p/' + fallbackImageId + '/media/?size=m'
+        var fallbackImageUrl = 'https://instagram.com/p/' + fallbackImageId + '/media/?size=l'
         imageEl.setAttribute('src', fallbackImageUrl);
         // console.log('loading: ', fallbackImageUrl);
         imageEl.addEventListener('load', showImage);
