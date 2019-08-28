@@ -19,9 +19,11 @@ const renderItem = function (item) {
             <img data-src="${ item.thumbnail_url }" alt="Post by ${ item.author_name }" />
           </a>
         </div>
-        <p class="card__attr"><a class="card__link" href="${ item.author_url }" target="_blank" rel="noopener noreferrer">
-          — ${ item.author_name }
-          </a></p>
+        <p class="card__attr">
+          — <a class="card__link" href="${ item.author_url }" target="_blank" rel="noopener noreferrer">
+            ${ item.author_name }
+          </a>
+        </p>
       </div>
     </div>
   `
@@ -37,7 +39,7 @@ module.exports = function render(locals) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
       <title>Adam Duncan &mdash; Pinstagram</title>
-      
+
       <meta name="theme-color" content="#fb576b">
       <meta name="description" content="Visual inspiration collected from Instagram." />
 
@@ -112,7 +114,7 @@ module.exports = function render(locals) {
           margin: 0;
         }
 
-        h1, 
+        h1,
         .t-large {
           font-size: 2em;
           font-size: calc(30px + (50 - 30) * ((100vw - 600px) / (2400 - 600)));
@@ -145,11 +147,14 @@ module.exports = function render(locals) {
         a:not[class]:focus {
           color: #fff;
         }
-        .link--breadcrumb {
-          border-bottom: 1px solid transparent;
-          color: currentColor;
+        .breadcrumb {
+          color: #212637;
           font-weight: 300;
           opacity: 0.4;
+        }
+        .link--breadcrumb {
+          border-bottom: 1px solid transparent;
+          color: inherit;
           text-decoration: none;
         }
         .link--breadcrumb[href]:hover,
@@ -175,7 +180,7 @@ module.exports = function render(locals) {
             width: 33.333%;
           }
         }
-        
+
         .card {
           margin-bottom: 3vw;
         }
@@ -190,12 +195,13 @@ module.exports = function render(locals) {
           background-color: rgba(0, 0, 0, 0.05);
         }
         .card__attr {
+          color: #888;
           font-size: 0.75rem;
           margin-top: 0.75rem;
         }
         .card__link {
           border-bottom: 1px solid transparent;
-          color: #888;
+          color: inherit;
         }
         .card__link:hover,
         .card__link:focus {
@@ -235,10 +241,10 @@ module.exports = function render(locals) {
       <h1>Pinstagram</h1>
       <p class="t-large">Visual inspiration collected from Instagram</p>
 
-      <p class="pad-top"><a href="/" class="link--breadcrumb"><span aria-label="Back to">&larr;</span> Adam Duncan</a></p>
+      <p class="breadcrumb pad-top"><span aria-label="Back to">&larr;</span> <a href="/" class="link--breadcrumb">Adam Duncan</a></p>
 
       <div class="grid pad-top pad-bottom">
-      ${ 
+      ${
         collectionData.items.map(function (item) {
           return renderItem(item)
         }).join('')
