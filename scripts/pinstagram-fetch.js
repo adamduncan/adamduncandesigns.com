@@ -1,5 +1,6 @@
 var fs = require("fs");
 var axios = require("axios");
+var chalk = require("chalk");
 var collectionData = require("../pinstagram/collection.json");
 
 var collection = { items: [] };
@@ -11,8 +12,12 @@ var getItemData = function() {
       .get(
         "https://api.instagram.com/oembed/?url=" + itemUrl + "&omitscript=true"
       )
+      .then(function(res) {
+        console.log(chalk.green("Fetched: " + itemUrl));
+        return res;
+      })
       .catch(function(error) {
-        console.log("Error 404 fetching item:", itemUrl);
+        console.error(chalk.red("Error 404 fetching item: " + itemUrl));
       });
   });
 };
